@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net.Http;
+﻿using MonitorBot.Models;
 using Newtonsoft.Json;
-using MonitorBot.Models;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
 
 
 namespace MonitorBot.Services
@@ -11,8 +13,21 @@ namespace MonitorBot.Services
     public class BotService
     {
         private Dictionary<string, long> _cache = new Dictionary<string, long>();
-        private readonly string _webhookUrl = "SUA_WEBHOOK_AQUI";
+        private readonly string _webhookUrl;
         private readonly HttpClient _httpClient = new HttpClient();
+
+        public BotService()
+        {
+            // Leitura do ficheiro appsettings.json
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+            IConfiguration config = builder.Build();
+
+            //Busca o valor dentro de DiscordConfig -> WebhookUrl
+            _webhookUrl = config["DiscordConfig:WebhookUrl"];
+        }
 
         public async Task<List<string>> ExecutarCiclo(long minimoXp)
         {
@@ -36,26 +51,15 @@ namespace MonitorBot.Services
 
                             if (_cache.TryGetValue(nomeChave, out long valorAntigo))
                             {
-                                if (valorAtual > valorAntigo) // Só entra se a XP subiu
-                                {
                                     long ganho = valorAtual - valorAntigo;
 
                                     if (ganho >= minimoXp)
                                     {
-                                        rushsdetectados.Add($"⭐ #{player.Rank} - **{player.Name}** - Lvl: {player.Level} - (Subiu +{ganho:N0})");
-
-                                        // SÓ atualiza o cache se enviamos o alerta. 
-                                        // Assim, se ele subir 50k agora e 110k depois, o bot soma e avisa quando bater 150k!
-                                        _cache[nomeChave] = valorAtual;
+                                        string msg = $"⭐ #{player.Rank} - **{player.Name}** - Lvl: {player.Level} - (Subiu +{ganho:N0})";
+                                        rushsdetectados.Add(msg);
                                     }
-                                    // Se o ganho foi pequeno (ex: 10k), NÃO atualizamos o cache. 
-                                    // Deixamos o valor antigo lá para ele acumular no próximo ciclo.
-                                }
-                                else if (valorAtual < valorAntigo)
-                                {
-                                    // Trata reset de meia-noite (XP zerou no site)
-                                    _cache[nomeChave] = valorAtual;
-                                }
+
+                                    _cache[nomeChave] = valorAtual; // Atualiza porque avisou
                             }
                             else
                             {
