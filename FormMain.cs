@@ -52,11 +52,12 @@ namespace MonitorBot
 
             if (resultados != null && resultados.Count > 0)
             {
+                // Envia para o discord
                 string msg = "**RELATÓRIO EXP**\n" + string.Join("\n", resultados);
                 await _botService.EnviarDiscord(msg);
 
-                // AQUI ESTÁ O SEGREDO: O log agora vai bater com o Discord
-                Log($"✅ {resultados.Count} rushs detectados e enviados!");
+                //Log no console do Bot
+                Log($"{resultados.Count} rushs enviados!");
             }
             else
             {
@@ -73,6 +74,11 @@ namespace MonitorBot
         }
 
         private void txtConsole_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void FormMain_Load(object sender, EventArgs e)
         {
 
         }

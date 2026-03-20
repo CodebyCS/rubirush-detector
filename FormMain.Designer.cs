@@ -74,7 +74,7 @@
             // 
             // mainTimer
             // 
-            mainTimer.Interval = 300000;
+            mainTimer.Interval = 240000;
             mainTimer.Tick += mainTimer_Tick;
             // 
             // MinXpRadar
@@ -134,8 +134,10 @@
             Controls.Add(pictureBox1);
             Controls.Add(txtConsole);
             Controls.Add(groupBox1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "FormMain";
-            Text = "Form1";
+            Text = "MataCoitado v1.0";
+            Load += FormMain_Load;
             ((System.ComponentModel.ISupportInitialize)numMinimoXp).EndInit();
             groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
