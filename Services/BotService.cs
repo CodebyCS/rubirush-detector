@@ -32,44 +32,44 @@ namespace MonitorBot.Services
         public async Task<List<string>> ExecutarCiclo(long minimoXp)
         {
             List<string> rushsdetectados = new List<string>();
+            var tarefas = new List<Task<string>>();
 
-            for (int p = 1; p <= 10; p++)
+            for (int p = 1; p <= 10; p++) 
             {
-                try
+                string url = $"https://rubinot.net/api/highscores?world=all&category=exp_today&vocation=0&page={p}&t={DateTime.Now.Ticks}";
+                tarefas.Add(_httpClient.GetStringAsync(url));
+            }
+
+            try
+            {
+                string[] resultadosJson = await Task.WhenAll(tarefas);
+
+                foreach (var json in resultadosJson)
                 {
-                    string url = $"https://rubinot.net/api/highscores?world=all&category=exp_today&vocation=0&page={p}&t={DateTime.Now.Ticks}";
-                    string json = await _httpClient.GetStringAsync(url);
-
                     var response = JsonConvert.DeserializeObject<HighscoreResponse>(json);
+                    if (response?.Players == null) continue;
 
-                    if(response?.Players != null)
+                    foreach (var player in response.Players)
                     {
-                        foreach (var player in response.Players)
+                        string nomeChave = player.Name.ToLower().Trim();
+                        long valorAtual = player.Value;
+
+                        if (_cache.TryGetValue(nomeChave, out long valorAntigo))
                         {
-                            string nomeChave = player.Name.ToLower().Trim();
-                            long valorAtual = player.Value;
+                            long ganho = valorAtual - valorAntigo;
 
-                            if (_cache.TryGetValue(nomeChave, out long valorAntigo))
+                            if (ganho >= minimoXp)
                             {
-                                    long ganho = valorAtual - valorAntigo;
-
-                                    if (ganho >= minimoXp)
-                                    {
-                                        string msg = $"⭐ #{player.Rank} - **{player.Name}** - Lvl: {player.Level} - (Subiu +{ganho:N0})";
-                                        rushsdetectados.Add(msg);
-                                    }
-
-                                    _cache[nomeChave] = valorAtual; // Atualiza porque avisou
-                            }
-                            else
-                            {
-                                _cache[nomeChave] = valorAtual;
+                                string msg = $"⭐ #{player.Rank} - **{player.Name}** - Lvl: {player.Level} - (Subiu +{ganho:N0})";
+                                rushsdetectados.Add(msg);
                             }
                         }
+                        _cache[nomeChave] = valorAtual; // Atualiza porque avisou
                     }
-
+                }   
+                
                 } catch { }
-            }
+            
             return rushsdetectados;
         }
 
