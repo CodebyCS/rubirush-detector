@@ -6,6 +6,10 @@ namespace MonitorBot
     {
         private BotService _botService = new BotService();
 
+        private System.Windows.Forms.Timer timerGuild;
+
+        private List<string> listaAntigaInimigos = new List<string>();
+
         public FormMain()
         {
             InitializeComponent();
@@ -24,6 +28,19 @@ namespace MonitorBot
 
             Log("Bot On");
 
+            // --- CONFIGURAÇÃO DO TIMER DA GUILD (ADICIONE ISSO) ---
+            if (timerGuild == null)
+            {
+                timerGuild = new System.Windows.Forms.Timer();
+                timerGuild.Interval = 3600000; // 1 hora
+                timerGuild.Tick += async (s, ev) => await AtualizarListaGuild();
+            }
+            timerGuild.Start();
+
+            // Já carrega a lista assim que clica no Start pela primeira vez
+            _ = AtualizarListaGuild();
+            // -------------------------------------------------------
+
             mainTimer.Start();
 
             await RodarProcesso();
@@ -32,6 +49,9 @@ namespace MonitorBot
         private void btnStop_Click(object sender, EventArgs e)
         {
             mainTimer.Stop();
+
+            timerGuild?.Stop();
+
             btnStart.Enabled = true;
             btnStop.Enabled = false;
             numMinimoXp.Enabled = true;
@@ -73,12 +93,63 @@ namespace MonitorBot
 
         }
 
+        private async Task AtualizarListaGuild()
+        {
+            try
+            {
+                var listaNova = await _botService.BuscarInimigos();
+
+                // Verificação de saida de membro da guild
+
+                var sairam = listaAntigaInimigos.Except(listaNova).ToList();
+                foreach (var nome in sairam)
+                {
+                    Log($"⚠️-- {nome} -- SAIU da Ghost Division");
+                    MessageBox.Show($"{nome} saiu da Ghost Division!", "Baixa na Guild", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
+                // Detectar novos membros na guild
+
+                if (listaAntigaInimigos.Count > 0)
+                {
+                    var entraram = listaNova.Except(listaAntigaInimigos).ToList();
+                    foreach (var nome in entraram)
+                    {
+                        Log($"⚔️ NOVO INIMIGO: {nome}");
+                        MessageBox.Show($"{nome} acabou de entrar na Ghost Division!", "Novo Inimigo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+
+                // Atualiza a memória para a proxima hora
+                listaAntigaInimigos = listaNova;
+
+                this.Invoke((Action)(() =>
+                {
+                    lstMembrosInimigos.Items.Clear();
+                    foreach (var inimigo in listaNova)
+                    {
+                        lstMembrosInimigos.Items.Add(inimigo);
+                    }
+
+                    // Contador para quantidade total de players na Guild
+
+                    lblTituloGuild.Text = $"Ghost Division - {listaNova.Count} Membros";
+                }));
+            }
+            catch { /* Erro silencioso para não travar o bot */ }
+        }
+
         private void txtConsole_TextChanged(object sender, EventArgs e)
         {
 
         }
 
         private void FormMain_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void GhostDivisionMembers_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

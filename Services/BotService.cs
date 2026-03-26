@@ -111,5 +111,45 @@ namespace MonitorBot.Services
 
             await Task.Delay(500);
         }
+
+        public async Task<List<string>> BuscarInimigos()
+        {
+            try
+            {
+                string url = "https://rubinot.net/api/guilds/Ghost%20Division";
+                string json = await _httpClient.GetStringAsync(url);
+
+                var data = JsonConvert.DeserializeObject<GuildResponse>(json);
+
+                return data?.Guild?.Members?
+                    .Select(m => $"[{TraduzirVocacao(m.Vocation)}]   {m.Name} -- Lvl: {m.Level}")
+                    .ToList() ?? new List<string>();
+            }
+            catch
+            {
+                return new List<string> { "Erro ao carregar Lista de Membros" };
+            }
+        }
+
+        private string TraduzirVocacao(string voc)
+        {
+            if (string.IsNullOrEmpty(voc)) return "??";
+
+            // Convertemos o texto da API para número para comparar
+            return voc.Trim() switch
+            {
+                "1" => "MS", // Sorcerer
+                "2" => "ED", // Druid
+                "3" => "RP", // Paladin
+                "4" => "EK", // Knight
+                "5" => "MS", // Master Sorcerer
+                "6" => "ED", // Elder Druid
+                "7" => "RP", // Royal Paladin
+                "8" => "EK", // Elite Knight
+                "9" => "EM", // Monk
+                "10" => "EM", //Exalted Monk
+                _ => voc     // Se for outro número, mostra ele mesmo
+            };
+        }
     }
 }

@@ -38,6 +38,8 @@
             groupBox1 = new GroupBox();
             txtConsole = new RichTextBox();
             pictureBox1 = new PictureBox();
+            lstMembrosInimigos = new ListBox();
+            lblTituloGuild = new Label();
             ((System.ComponentModel.ISupportInitialize)numMinimoXp).BeginInit();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -103,7 +105,7 @@
             // 
             // txtConsole
             // 
-            txtConsole.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            txtConsole.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             txtConsole.BackColor = Color.FromArgb(29, 28, 26);
             txtConsole.BorderStyle = BorderStyle.FixedSingle;
             txtConsole.Font = new Font("Consolas", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -125,12 +127,38 @@
             pictureBox1.TabIndex = 8;
             pictureBox1.TabStop = false;
             // 
+            // lstMembrosInimigos
+            // 
+            lstMembrosInimigos.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            lstMembrosInimigos.BackColor = Color.FromArgb(29, 28, 26);
+            lstMembrosInimigos.BorderStyle = BorderStyle.FixedSingle;
+            lstMembrosInimigos.ForeColor = Color.FromArgb(214, 36, 27);
+            lstMembrosInimigos.FormattingEnabled = true;
+            lstMembrosInimigos.Location = new Point(422, 55);
+            lstMembrosInimigos.Name = "lstMembrosInimigos";
+            lstMembrosInimigos.Size = new Size(255, 482);
+            lstMembrosInimigos.TabIndex = 9;
+            lstMembrosInimigos.SelectedIndexChanged += GhostDivisionMembers_SelectedIndexChanged;
+            // 
+            // lblTituloGuild
+            // 
+            lblTituloGuild.AutoSize = true;
+            lblTituloGuild.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblTituloGuild.ForeColor = Color.FromArgb(214, 36, 27);
+            lblTituloGuild.Location = new Point(458, 25);
+            lblTituloGuild.Name = "lblTituloGuild";
+            lblTituloGuild.Size = new Size(181, 20);
+            lblTituloGuild.TabIndex = 10;
+            lblTituloGuild.Text = "Ghost Division Members";
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(29, 28, 26);
-            ClientSize = new Size(437, 561);
+            ClientSize = new Size(701, 561);
+            Controls.Add(lblTituloGuild);
+            Controls.Add(lstMembrosInimigos);
             Controls.Add(pictureBox1);
             Controls.Add(txtConsole);
             Controls.Add(groupBox1);
@@ -142,6 +170,7 @@
             groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -153,5 +182,7 @@
         private GroupBox groupBox1;
         private RichTextBox txtConsole;
         private PictureBox pictureBox1;
+        private ListBox lstMembrosInimigos;
+        private Label lblTituloGuild;
     }
 }
