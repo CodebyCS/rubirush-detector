@@ -164,7 +164,7 @@
             Controls.Add(groupBox1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "FormMain";
-            Text = "MataCoitado v1.1";
+            Text = "MataCoitado v1.0.1";
             Load += FormMain_Load;
             ((System.ComponentModel.ISupportInitialize)numMinimoXp).EndInit();
             groupBox1.ResumeLayout(false);

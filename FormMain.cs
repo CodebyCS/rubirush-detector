@@ -1,5 +1,6 @@
 using AutoUpdaterDotNET;
 using MonitorBot.Services;
+using System.Timers;
 
 namespace MonitorBot
 {
@@ -10,6 +11,8 @@ namespace MonitorBot
         private System.Windows.Forms.Timer timerGuild;
 
         private List<string> listaAntigaInimigos = new List<string>();
+
+        private System.Timers.Timer _updateTimer;
 
         public FormMain()
         {
@@ -147,8 +150,31 @@ namespace MonitorBot
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            
+            ConfigurarAutoUpdater();
+
+            // Primeira checagem assim que abre
             AutoUpdater.Start("https://raw.githubusercontent.com/CodebyCS/rubirush-detector/master/AutoUpdater.xml");
+
+            // Checagem a cada 24h horas
+            _updateTimer = new System.Timers.Timer(24 * 60 * 60 * 1000);
+            _updateTimer.Elapsed += (s, args) => {
+                AutoUpdater.Start("https://raw.githubusercontent.com/CodebyCS/rubirush-detector/master/AutoUpdater.xml");
+            };
+            _updateTimer.AutoReset = true;
+            _updateTimer.Enabled = true;
+
         }
+
+        private void ConfigurarAutoUpdater()
+        {
+            AutoUpdater.ShowSkipButton = false;
+            AutoUpdater.ShowRemindLaterButton = false;
+            AutoUpdater.Mandatory = true;
+            AutoUpdater.UpdateMode = Mode.Forced;
+
+        }
+
 
         private void GhostDivisionMembers_SelectedIndexChanged(object sender, EventArgs e)
         {
