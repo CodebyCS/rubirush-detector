@@ -1,3 +1,4 @@
+using AutoUpdaterDotNET;
 using MonitorBot.Services;
 
 namespace MonitorBot
@@ -146,7 +147,7 @@ namespace MonitorBot
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-
+            AutoUpdater.Start("https://raw.githubusercontent.com/CodebyCS/rubirush-detector/master/AutoUpdater.xml");
         }
 
         private void GhostDivisionMembers_SelectedIndexChanged(object sender, EventArgs e)
