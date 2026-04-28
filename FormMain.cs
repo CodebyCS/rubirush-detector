@@ -173,6 +173,17 @@ namespace MonitorBot
             AutoUpdater.Mandatory = true;
             AutoUpdater.UpdateMode = Mode.Forced;
 
+            AutoUpdater.CheckForUpdateEvent += (args) => {
+                if (args.IsUpdateAvailable)
+                {
+                    // Tenta baixar silenciosamente. Se retornar true, o download terminou com sucesso.
+                    if (AutoUpdater.DownloadUpdate(args))
+                    {
+                        Application.Exit();
+                    }
+                }
+            };
+
         }
 
 
