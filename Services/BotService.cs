@@ -112,7 +112,7 @@ namespace MonitorBot.Services
             await Task.Delay(500);
         }
 
-        public async Task<List<string>> BuscarInimigos()
+        /*public async Task<List<string>> BuscarInimigos()
         {
             try
             {
@@ -150,6 +150,6 @@ namespace MonitorBot.Services
                 "10" => "EM", //Exalted Monk
                 _ => voc     // Se for outro número, mostra ele mesmo
             };
-        }
+        }*/
     }
 }
