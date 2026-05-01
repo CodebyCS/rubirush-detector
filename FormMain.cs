@@ -85,20 +85,31 @@ namespace MonitorBot
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            
+            // 1. Limpeza de instâncias travadas
+            try
+            {
+                var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                var processes = System.Diagnostics.Process.GetProcessesByName(currentProcess.ProcessName);
+                foreach (var process in processes)
+                {
+                    if (process.Id != currentProcess.Id) process.Kill();
+                }
+            }
+            catch { /* Ignora erros de permissão */ }
+
+            // 2. Configuração (Onde definimos se é modo síncrono, etc)
             ConfigurarAutoUpdater();
 
-            // Primeira checagem assim que abre
+            // 3. Início imediato
             AutoUpdater.Start("https://raw.githubusercontent.com/CodebyCS/rubirush-detector/master/AutoUpdater.xml");
 
-            // Checagem a cada 24h horas
+            // 4. Timer de 24h
             _updateTimer = new System.Timers.Timer(24 * 60 * 60 * 1000);
             _updateTimer.Elapsed += (s, args) => {
                 AutoUpdater.Start("https://raw.githubusercontent.com/CodebyCS/rubirush-detector/master/AutoUpdater.xml");
             };
             _updateTimer.AutoReset = true;
             _updateTimer.Enabled = true;
-
         }
 
         private void ConfigurarAutoUpdater()
@@ -111,14 +122,13 @@ namespace MonitorBot
             AutoUpdater.CheckForUpdateEvent += (args) => {
                 if (args.IsUpdateAvailable)
                 {
-                    // Tenta baixar silenciosamente. Se retornar true, o download terminou com sucesso.
                     if (AutoUpdater.DownloadUpdate(args))
                     {
-                        Application.Exit();
+                        // Encerra o processo IMEDIATAMENTE para o Windows liberar o .exe
+                        System.Diagnostics.Process.GetCurrentProcess().Kill();
                     }
                 }
             };
-
         }
     }
 }
